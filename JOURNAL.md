@@ -16,7 +16,7 @@ One way to solve it as I can see is to implement window_hours currently, which m
 The codebase shows a hardcoded review with no AI generation integrated even and the clear solution is adding the safety monitor and providing multi-turn support.
 
 **Branch name:** fix/66-safety-monitor-multi-turn-metrics
-
+https://github.com/aliabbaka/pathreview/blob/fix/66-safety-monitor-multi-turn-metrics/JOURNAL.md
 **Setup confirmation:** [x] App runs locally at localhost:5173
 
 **Cohort ledger:** [x] Issue added to cohort ledger
