@@ -24,14 +24,11 @@ https://github.com/aliabbaka/pathreview/blob/fix/66-safety-monitor-multi-turn-me
 
 ## Week 8 — Reproduction & solution planning
 
-**Reproduction commit link:** [link to commit documenting the reproduced issue]
+**Reproduction commit link:** https://github.com/aliabbaka/pathreview/commit/3e041c75750ed1bcc1236005ed38f7c139b4ad7a
 
-**Reproduction summary:**
-[1–2 sentences: How did you reproduce the issue? What did you observe?]
+**Reproduction summary:**Added a failing unit test (test_monitoring.py::test_window_hours_is_ignored_reproduces_66) that records 5 lifetime content_filtered events with only 2 inside the last hour, then calls get_event_count("content_filtered", window_hours=1). It returns 5 instead of 2 (assert 5 == 2 fails), confirming window_hours is ignored so events across a multi-turn conversation are never counted within a rolling window.
+**PLAN.md link:** https://github.com/aliabbaka/pathreview/blob/fix/66-safety-monitor-multi-turn-metrics/PLAN.md
 
-**PLAN.md link:** [link to PLAN.md in your fork]
-
-**Walkthrough video (recommended):** [link to your Loom video, ≤2 min — recommended, not graded]
-
+**Walkthrough video (recommended):** https://drive.google.com/file/d/1S-X-YzFoySNWFty719cXwbFFI_7OrP8A/view?usp=sharing
 **Blockers or open questions:**
-[Anything you're still uncertain about going into Week 9, or leave blank]
+If there could be a bigger time frame, more than two hours but that will not increase the latency of the answers.
