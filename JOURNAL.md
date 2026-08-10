@@ -45,7 +45,7 @@ via `zremrangebyscore` + `zcard`, mirroring `RateLimiter`. The reproduction test
 write, windowed count, error path) and hardened the unknown-type test. `ruff`/`black`/
 `mypy` clean on changed files; 5/5 monitoring tests pass.
 
-**Draft PR:** _(to be added once opened)_
+**Draft PR:** https://github.com/ascherj/pathreview/pull/1022
 
 **Blockers or open questions:** Whether wiring `get_event_count` into the content-filter
 path (PLAN §3.3) should be part of this issue or a separate follow-up. `SafetyMonitor`
