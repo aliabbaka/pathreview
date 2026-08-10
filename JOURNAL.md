@@ -32,3 +32,21 @@ https://github.com/aliabbaka/pathreview/blob/fix/66-safety-monitor-multi-turn-me
 **Walkthrough video (recommended):** https://drive.google.com/file/d/1S-X-YzFoySNWFty719cXwbFFI_7OrP8A/view?usp=sharing
 **Blockers or open questions:**
 If there could be a bigger time frame, more than two hours but that will not increase the latency of the answers.
+
+
+## Week 9 — Implementation & review
+
+**Fix commit link:** https://github.com/aliabbaka/pathreview/commit/02bd06f
+
+**What I built:** Switched `SafetyMonitor` from a cumulative `INCR` counter to a
+Redis sorted set of timestamped events. `get_event_count` now enforces `window_hours`
+via `zremrangebyscore` + `zcard`, mirroring `RateLimiter`. The reproduction test
+(`test_window_hours_is_ignored_reproduces_66`) now passes; added 3 tests (timestamped
+write, windowed count, error path) and hardened the unknown-type test. `ruff`/`black`/
+`mypy` clean on changed files; 5/5 monitoring tests pass.
+
+**Draft PR:** _(to be added once opened)_
+
+**Blockers or open questions:** Whether wiring `get_event_count` into the content-filter
+path (PLAN §3.3) should be part of this issue or a separate follow-up. `SafetyMonitor`
+currently has no callers.
