@@ -43,6 +43,43 @@ class TestSafetyMonitor:
         """Unknown event types are ignored and never written to Redis."""
         monitor.log_event("not_a_real_event", {"foo": "bar"})
         mock_redis.incr.assert_not_called()
+        mock_redis.zadd.assert_not_called()
+
+    def test_log_event_writes_timestamped_entry(
+        self, monitor: SafetyMonitor, mock_redis: Mock
+    ) -> None:
+        """log_event stores a sorted-set entry scored by timestamp + sets expiry."""
+        monitor.log_event("content_filtered", {"reason": "test"})
+
+        mock_redis.zadd.assert_called_once()
+        key, mapping = mock_redis.zadd.call_args[0]
+        assert key == "safety:events:content_filtered"
+        # Single member whose value equals its score (the timestamp).
+        ((member, score),) = mapping.items()
+        assert float(member) == score
+        mock_redis.expire.assert_called_once_with("safety:events:content_filtered", 86400)
+
+    def test_get_event_count_trims_then_counts_window(
+        self, monitor: SafetyMonitor, mock_redis: Mock
+    ) -> None:
+        """get_event_count trims by window_start and returns the sorted-set size."""
+        mock_redis.zcard = Mock(return_value=3)
+
+        count = monitor.get_event_count("content_filtered", window_hours=2)
+
+        mock_redis.zremrangebyscore.assert_called_once()
+        key, low, high = mock_redis.zremrangebyscore.call_args[0]
+        assert key == "safety:events:content_filtered"
+        assert low == 0
+        assert high > 0  # window_start = now - 2h, a timestamp in the past
+        assert count == 3
+
+    def test_get_event_count_returns_zero_on_error(
+        self, monitor: SafetyMonitor, mock_redis: Mock
+    ) -> None:
+        """A Redis failure is swallowed and yields 0 (fail-closed count)."""
+        mock_redis.zremrangebyscore = Mock(side_effect=Exception("redis down"))
+        assert monitor.get_event_count("content_filtered") == 0
 
     def test_window_hours_is_ignored_reproduces_66(
         self, monitor: SafetyMonitor, mock_redis: Mock
